@@ -57,6 +57,8 @@ class LevelList:
         self.author=keys.get('k5','')
         
         levels:dict[str,dict]=keys.get('k97',{})
+        if not isinstance(levels,dict):
+            levels={}
         for level in levels:
             
             self.levels.append(ListLevel(levels[level]))

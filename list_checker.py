@@ -54,6 +54,9 @@ if __name__ == "__main__":
         # pprint(obj, width=120)
             
         level_lists.append(levellist.LevelList(obj))
+        
+    for level_list in level_lists:
+        print(f"Loaded list '{level_list.name}' with {level_list.levels.__len__()} levels")
     
     
     last_clip=""
@@ -72,13 +75,16 @@ if __name__ == "__main__":
             id=int(clip)
             
             found=False
+            contained_lists:list[str]=[]
             for list1 in level_lists:
                 if id in list1.get_levels().keys():
-                    notify(f"Level {id} is in list \"{list1.name}\"")
+                    contained_lists.append('"'+list1.name+'"')
                     found=True
             
             if not found:
                 notify(f"Level {id} is not in any list")
+            else:
+                notify(f"Level {id} is in list {", ".join(contained_lists)}")
             
         except:
             pass
