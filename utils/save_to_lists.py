@@ -1,5 +1,5 @@
 import os
-from .gd_save_decryptor import saves
+from . import gd_save_decryptor
 from . import xml_parser
 from .levellist import LevelList
 
@@ -8,7 +8,7 @@ TEMPFILE_PATH="/tmp/CCLocalLevels.xml"
 
 def load_cclocallevels_file(savepath:str):
     with open(TEMPFILE_PATH,"w") as f:
-        f.write(saves.decrypt_save(savepath))
+        f.write(gd_save_decryptor.decrypt_save(savepath))
     leveldict=xml_parser.load_gmd(TEMPFILE_PATH)
     os.remove(TEMPFILE_PATH)
     

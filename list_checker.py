@@ -36,32 +36,30 @@ def notify(message:str):
 
 def main():
     import argparse
-    p = argparse.ArgumentParser(description="读取 .gmd XML 并反序列化为 Python 类型（仅读取/反序列化）")
-    p.add_argument("input", help="输入 .gmd 文件路径")
+    p = argparse.ArgumentParser(description="Parse GD level lists from exported lists or savefile, and check existence in lists for every level you copied in clipboard")
+    p.add_argument("input", help="path to the list file, CCLocalLevels.dat save file, or a folder containing the lists")
     args = p.parse_args()
 
     inputFile = str(args.input)
     
     level_lists:list[levellist.LevelList]=[]
     
-    if(inputFile.endswith(".dat")):
-        print(f"尝试解析存档文件 {inputFile} ...")
-        from utils.save_to_lists import load_cclocallevels_file,load_lists
-        levels,lists=load_cclocallevels_file(inputFile)
-        if(lists==None):
-            print(f"存档解析失败,请检查是否为完整的 CCLocalLevels.dat")
-            return
-        level_lists.extend(load_lists(lists))
-    else:
-        files = listTree(inputFile)
-        print(files)
+    files = listTree(inputFile)
+    print(files)
+    
+    for file in files:
         
-        for file in files:
+        if file.endswith('.dat'):
+            print(f"Try to parse save file {file} ...")
+            from utils.save_to_lists import load_cclocallevels_file,load_lists
+            levels,lists=load_cclocallevels_file(file)
+            if(lists==None):
+                print(f"Failed to parse save file, please make sure it's CCLocalLevels.dat")
+                continue
+            level_lists.extend(load_lists(lists))
+        elif file.endswith('.gmd') or file.endswith('.gmdl') or file.endswith('.xml'):
+            print(f"Try to parse exported list file {file} ...")
             obj = load_gmd(file)
-            # # 以 Python 表示输出，便于进一步在脚本中 eval/repr 使用
-            # from pprint import pprint
-            # pprint(obj, width=120)
-                
             level_lists.append(levellist.LevelList(obj))
             
     for level_list in level_lists:
