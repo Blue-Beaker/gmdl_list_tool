@@ -3,8 +3,8 @@ import argparse
 import xml.etree.ElementTree as ET
 from typing import Any, Union
 import os,sys
-from xml_parser import load_gmd
-import levellist
+from utils.xml_parser import load_gmd
+import utils.levellist as levellist
 
 def listTree(rootpath:str)->list[str]:
     def filenameMatches(filepath:str):

@@ -5,8 +5,8 @@ import time
 import xml.etree.ElementTree as ET
 from typing import Any, Union
 import os,sys
-from xml_parser import load_gmd
-import levellist
+from utils.xml_parser import load_gmd
+import utils.levellist as levellist
 import pyperclip
 
 def listTree(rootpath:str)->list[str]:
@@ -34,7 +34,7 @@ def notify(message:str):
                     "-t","5000",
                     message,message])
 
-if __name__ == "__main__":
+def main():
     import argparse
     p = argparse.ArgumentParser(description="读取 .gmd XML 并反序列化为 Python 类型（仅读取/反序列化）")
     p.add_argument("input", help="输入 .gmd 文件路径")
@@ -42,19 +42,28 @@ if __name__ == "__main__":
 
     inputFile = str(args.input)
     
-    files = listTree(inputFile)
-    print(files)
-    
     level_lists:list[levellist.LevelList]=[]
     
-    for file in files:
-        obj = load_gmd(file)
-        # # 以 Python 表示输出，便于进一步在脚本中 eval/repr 使用
-        # from pprint import pprint
-        # pprint(obj, width=120)
-            
-        level_lists.append(levellist.LevelList(obj))
+    if(inputFile.endswith(".dat")):
+        print(f"尝试解析存档文件 {inputFile} ...")
+        from utils.save_to_lists import load_cclocallevels_file,load_lists
+        levels,lists=load_cclocallevels_file(inputFile)
+        if(lists==None):
+            print(f"存档解析失败,请检查是否为完整的 CCLocalLevels.dat")
+            return
+        level_lists.extend(load_lists(lists))
+    else:
+        files = listTree(inputFile)
+        print(files)
         
+        for file in files:
+            obj = load_gmd(file)
+            # # 以 Python 表示输出，便于进一步在脚本中 eval/repr 使用
+            # from pprint import pprint
+            # pprint(obj, width=120)
+                
+            level_lists.append(levellist.LevelList(obj))
+            
     for level_list in level_lists:
         print(f"Loaded list '{level_list.name}' with {level_list.levels.__len__()} levels")
     
@@ -91,3 +100,7 @@ if __name__ == "__main__":
         
         
         time.sleep(1)
+        
+
+if __name__ == "__main__":
+    main()
